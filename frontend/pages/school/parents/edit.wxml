@@ -1,0 +1,30 @@
+<view class="container">
+  <view class="header">
+    <text class="title">{{parentId ? '编辑家长' : '添加家长'}}</text>
+  </view>
+  
+  <view class="form-container">
+    <view class="form-item">
+      <text class="label">家长姓名</text>
+      <input type="text" placeholder="请输入家长姓名" value="{{parent.nickname}}" bindinput="inputNickname" />
+    </view>
+    
+    <view class="form-item">
+      <text class="label">手机号管理</text>
+      <view class="phones-container">
+        <view class="phone-item" wx:for="{{parent.phones}}" wx:key="index">
+          <input type="number" placeholder="请输入手机号" value="{{item}}" bindinput="inputPhone" data-index="{{index}}" />
+          <button class="delete-phone-btn" bindtap="deletePhone" data-index="{{index}}">-</button>
+        </view>
+        <button class="add-phone-btn" bindtap="addPhone">+ 添加手机号</button>
+      </view>
+    </view>
+    
+    <view class="form-item">
+      <text class="label">备注</text>
+      <textarea placeholder="请输入备注信息" value="{{parent.remark}}" bindinput="inputRemark" />
+    </view>
+  </view>
+  
+  <button class="save-btn" bindtap="saveParent">保存</button>
+</view>

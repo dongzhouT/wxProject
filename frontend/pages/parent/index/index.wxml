@@ -1,0 +1,37 @@
+<view class="container">
+  <view class="header">
+    <text class="title">家长中心</text>
+  </view>
+  
+  <view class="menu">
+    <view class="menu-item" bindtap="navigateToSchedule">
+      <view class="menu-icon">📅</view>
+      <text class="menu-text">查看课表</text>
+    </view>
+    
+    <view class="menu-item" bindtap="navigateToLeave">
+      <view class="menu-icon">📝</view>
+      <text class="menu-text">请假申请</text>
+    </view>
+    
+    <view class="menu-item" bindtap="navigateToBooking">
+      <view class="menu-icon">📞</view>
+      <text class="menu-text">约课</text>
+    </view>
+    
+    <view class="menu-item" bindtap="navigateToCourseCount">
+      <view class="menu-icon">📊</view>
+      <text class="menu-text">剩余课程</text>
+    </view>
+    
+    <view class="menu-item" bindtap="navigateToNotifications">
+      <view class="menu-icon">🔔</view>
+      <text class="menu-text">接收通知</text>
+    </view>
+    
+    <view class="menu-item" bindtap="logout">
+      <view class="menu-icon">🚪</view>
+      <text class="menu-text">退出登录</text>
+    </view>
+  </view>
+</view>

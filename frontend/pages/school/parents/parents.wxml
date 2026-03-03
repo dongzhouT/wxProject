@@ -1,0 +1,30 @@
+<view class="container">
+  <view class="header">
+    <text class="title">家长管理</text>
+    <button class="add-btn" bindtap="addParent">+ 添加家长</button>
+  </view>
+  
+  <view class="search-bar">
+    <input type="text" placeholder="搜索家长姓名或手机号" bindinput="inputSearch" value="{{searchText}}" />
+    <button class="search-btn" bindtap="search">搜索</button>
+  </view>
+  
+  <view class="parent-list">
+    <view class="parent-item" wx:for="{{parents}}" wx:key="id">
+      <view class="parent-info">
+        <text class="parent-name">{{item.nickname}}</text>
+        <text class="parent-phone">{{item.phones ? item.phones.join(', ') : '未设置'}}</text>
+        <text class="parent-orders">订单数: {{item.order_count || 0}}</text>
+      </view>
+      <view class="parent-actions">
+        <button class="action-btn" bindtap="viewDetails" data-id="{{item.id}}">详情</button>
+        <button class="action-btn" bindtap="editParent" data-id="{{item.id}}">编辑</button>
+        <button class="action-btn delete" bindtap="deleteParent" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+  </view>
+  
+  <view class="empty" wx:if="{{parents.length === 0}}">
+    <text>暂无家长数据</text>
+  </view>
+</view>

@@ -1,0 +1,32 @@
+<view class="container">
+  <view class="logo">
+    <image src="/assets/images/logo.png" mode="aspectFit"></image>
+    <text class="title">兴趣班管理系统</text>
+  </view>
+  
+  <view class="role-selector">
+    <view class="role-tab {{role === 'admin' ? 'active' : ''}}" data-role="admin" bindtap="switchRole">管理员</view>
+    <view class="role-tab {{role === 'school' ? 'active' : ''}}" data-role="school" bindtap="switchRole">学校</view>
+    <view class="role-tab {{role === 'parent' ? 'active' : ''}}" data-role="parent" bindtap="switchRole">家长</view>
+  </view>
+  
+  <view class="form-container">
+    <view class="form-item" wx:if="{{role !== 'parent' && role !== 'school'}}">
+      <text class="label">用户名</text>
+      <input type="text" placeholder="请输入用户名" value="{{username}}" bindinput="inputUsername" />
+    </view>
+    
+    <view class="form-item" wx:if="{{role !== 'parent' && role !== 'school'}}">
+      <text class="label">密码</text>
+      <input type="password" placeholder="请输入密码" value="{{password}}" bindinput="inputPassword" password="true" />
+    </view>
+    
+    <view class="login-tip" wx:if="{{role === 'parent' || role === 'school'}}">
+      <text>{{role === 'parent' ? '家长登录将使用微信账号授权登录' : '学校登录将使用微信手机号授权登录'}}</text>
+    </view>
+    
+    <button class="login-btn" bindtap="login" loading="{{loading}}">
+      {{role === 'parent' || role === 'school' ? '微信登录' : '登录'}}
+    </button>
+  </view>
+</view>

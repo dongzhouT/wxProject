@@ -1,0 +1,44 @@
+{
+  "pages": [
+    "pages/common/login/login",
+    "pages/parent/index/index",
+    "pages/admin/index/index",
+    "pages/admin/schools/schools",
+    "pages/admin/school_accounts/school_accounts",
+    "pages/school/index/index",
+    "pages/school/parents/parents",
+    "pages/school/parents/edit",
+    "pages/school/parents/details",
+    "pages/school/courses/courses",
+    "pages/school/attendance/attendance",
+    "pages/school/consume/consume"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "兴趣班管理",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#007aff",
+    "backgroundColor": "#fff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/parent/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/common/login/login",
+        "text": "登录"
+      }
+    ]
+  },
+  "networkTimeout": {
+    "request": 10000,
+    "downloadFile": 10000
+  },
+  "debug": true,
+  "sitemapLocation": "sitemap.json"
+}

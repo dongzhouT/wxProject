@@ -1,0 +1,32 @@
+<view class="container">
+  <view class="header">
+    <text class="title">学校管理中心</text>
+  </view>
+  
+  <view class="menu">
+    <view class="menu-item" bindtap="navigateToParents">
+      <view class="menu-icon">👨‍👩‍👧‍👦</view>
+      <text class="menu-text">家长管理</text>
+    </view>
+    
+    <view class="menu-item" bindtap="navigateToCourses">
+      <view class="menu-icon">📚</view>
+      <text class="menu-text">课程管理</text>
+    </view>
+    
+    <view class="menu-item" bindtap="navigateToAttendance">
+      <view class="menu-icon">📝</view>
+      <text class="menu-text">出勤管理</text>
+    </view>
+    
+    <view class="menu-item" bindtap="navigateTo消课">
+      <view class="menu-icon">✏️</view>
+      <text class="menu-text">消课操作</text>
+    </view>
+    
+    <view class="menu-item" bindtap="logout">
+      <view class="menu-icon">🚪</view>
+      <text class="menu-text">退出登录</text>
+    </view>
+  </view>
+</view>

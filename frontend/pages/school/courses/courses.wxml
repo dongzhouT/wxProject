@@ -1,0 +1,30 @@
+<view class="container">
+  <view class="header">
+    <text class="title">课程管理</text>
+    <button class="add-btn" bindtap="addCourse">+ 添加课程</button>
+  </view>
+  
+  <view class="search-bar">
+    <input type="text" placeholder="搜索课程名称" bindinput="inputSearch" value="{{searchText}}" />
+    <button class="search-btn" bindtap="search">搜索</button>
+  </view>
+  
+  <view class="course-list">
+    <view class="course-item" wx:for="{{courses}}" wx:key="id">
+      <view class="course-info">
+        <text class="course-name">{{item.name}}</text>
+        <text class="course-category">{{item.category}}</text>
+        <text class="course-price">¥{{item.price}}/课时</text>
+      </view>
+      <view class="course-actions">
+        <button class="action-btn" bindtap="viewDetails" data-id="{{item.id}}">详情</button>
+        <button class="action-btn" bindtap="editCourse" data-id="{{item.id}}">编辑</button>
+        <button class="action-btn delete" bindtap="deleteCourse" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+  </view>
+  
+  <view class="empty" wx:if="{{courses.length === 0}}">
+    <text>暂无课程数据</text>
+  </view>
+</view>

@@ -1,0 +1,91 @@
+<view class="container">
+  <view class="header">
+    <text class="title">{{schoolName}} - 账户管理</text>
+    <text class="account-count">当前账户数：{{accounts.length}}/{{accountLimit}}</text>
+    <button class="add-btn" bindtap="showAddAccountModal">+ 添加账户</button>
+  </view>
+  
+  <view class="search-bar">
+    <input placeholder="搜索账户用户名" bindinput="inputSearch" value="{{searchText}}" />
+    <button class="search-btn" bindtap="searchAccounts">搜索</button>
+  </view>
+  
+  <view class="account-list">
+    <block wx:for="{{accounts}}" wx:key="id">
+      <view class="account-item">
+        <view class="account-info">
+          <text class="account-username">微信名称：{{item.wechat_name || item.username}}</text>
+          <text class="account-realname">真实姓名：{{item.real_name}}</text>
+          <text class="account-phone">手机号：{{item.phone}}</text>
+          <text class="account-role">角色：{{item.role === 'admin' ? '管理员' : '工作人员'}}</text>
+        </view>
+        <view class="account-actions">
+          <button class="edit-btn" bindtap="showEditAccountModal" data-account="{{item}}">编辑</button>
+          <button class="delete-btn" bindtap="confirmDeleteAccount" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
+    </block>
+  </view>
+  
+  <!-- 空状态 -->
+  <view wx:if="{{accounts.length === 0}}" class="empty-state">
+    <text>暂无账户数据</text>
+  </view>
+  
+  <!-- 添加账户模态框 -->
+  <modal wx:if="{{showAddModal}}" title="添加账户" confirm-text="保存" cancel-text="取消" bindconfirm="addAccount" bindcancel="hideAddAccountModal">
+    <view class="modal-content">
+      <view class="form-item">
+        <text class="label">微信名称 *</text>
+        <input placeholder="请输入微信名称" bindinput="inputWechatName" value="{{newAccount.wechat_name}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">真实姓名 *</text>
+        <input placeholder="请输入真实姓名" bindinput="inputRealName" value="{{newAccount.real_name}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">手机号 *</text>
+        <input placeholder="请输入手机号" bindinput="inputPhone" value="{{newAccount.phone}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">角色</text>
+        <picker bindchange="bindRoleChange" value="{{newAccount.roleIndex}}" range="{{roles}}">
+          <view class="picker">
+            {{roles[newAccount.roleIndex]}}
+          </view>
+        </picker>
+      </view>
+    </view>
+  </modal>
+  
+  <!-- 编辑账户模态框 -->
+  <modal wx:if="{{showEditModal}}" title="编辑账户" confirm-text="保存" cancel-text="取消" bindconfirm="updateAccount" bindcancel="hideEditAccountModal">
+    <view class="modal-content">
+      <view class="form-item">
+        <text class="label">微信名称 *</text>
+        <input placeholder="请输入微信名称" bindinput="inputEditWechatName" value="{{editAccount.wechat_name}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">真实姓名 *</text>
+        <input placeholder="请输入真实姓名" bindinput="inputEditRealName" value="{{editAccount.real_name}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">手机号 *</text>
+        <input placeholder="请输入手机号" bindinput="inputEditPhone" value="{{editAccount.phone}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">角色</text>
+        <picker bindchange="bindEditRoleChange" value="{{editAccount.roleIndex}}" range="{{roles}}">
+          <view class="picker">
+            {{roles[editAccount.roleIndex]}}
+          </view>
+        </picker>
+      </view>
+    </view>
+  </modal>
+  
+  <!-- 确认删除模态框 -->
+  <modal wx:if="{{showDeleteModal}}" title="确认删除" confirm-text="删除" cancel-text="取消" bindconfirm="deleteAccount" bindcancel="hideDeleteModal">
+    <text>确定要删除此账户吗？</text>
+  </modal>
+</view>

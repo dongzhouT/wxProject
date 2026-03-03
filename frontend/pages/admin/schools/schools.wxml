@@ -1,0 +1,99 @@
+<view class="container">
+  <view class="header">
+    <text class="title">学校管理</text>
+    <button class="add-btn" bindtap="showAddSchoolModal">+ 添加学校</button>
+  </view>
+  
+  <view class="search-bar">
+    <input placeholder="搜索学校名称" bindinput="inputSearch" value="{{searchText}}" />
+    <button class="search-btn" bindtap="searchSchools">搜索</button>
+  </view>
+  
+  <view class="school-list">
+    <block wx:for="{{schools}}" wx:key="id">
+      <view class="school-item">
+        <view class="school-info">
+          <text class="school-name">{{item.name}}</text>
+          <text class="school-contact">{{item.contact_person}} {{item.contact_phone}}</text>
+          <text class="school-address" wx:if="{{item.address}}">{{item.address}}</text>
+          <text class="school-account-limit">子账号上限：{{item.account_limit || 3}}</text>
+        </view>
+        <view class="school-actions">
+          <button class="edit-btn" bindtap="showEditSchoolModal" data-school="{{item}}">编辑</button>
+          <button class="delete-btn" bindtap="confirmDeleteSchool" data-id="{{item.id}}">删除</button>
+          <button class="accounts-btn" bindtap="navigateToSchoolAccounts" data-id="{{item.id}}" data-name="{{item.name}}" data-limit="{{item.account_limit || 3}}">账户管理</button>
+        </view>
+      </view>
+    </block>
+  </view>
+  
+  <!-- 空状态 -->
+  <view wx:if="{{schools.length === 0}}" class="empty-state">
+    <text>暂无学校数据</text>
+  </view>
+  
+  <!-- 添加学校模态框 -->
+  <modal wx:if="{{showAddModal}}" title="添加学校" confirm-text="保存" cancel-text="取消" bindconfirm="addSchool" bindcancel="hideAddSchoolModal">
+    <view class="modal-content">
+      <view class="form-item">
+        <text class="label">学校名称 *</text>
+        <input placeholder="请输入学校名称" bindinput="inputSchoolName" value="{{newSchool.name}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">联系人 *</text>
+        <input placeholder="请输入联系人" bindinput="inputContactPerson" value="{{newSchool.contact_person}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">联系电话 *</text>
+        <input placeholder="请输入联系电话" bindinput="inputContactPhone" value="{{newSchool.contact_phone}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">地址</text>
+        <input placeholder="请输入学校地址" bindinput="inputAddress" value="{{newSchool.address}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">描述</text>
+        <textarea placeholder="请输入学校描述" bindinput="inputDescription" value="{{newSchool.description}}" style="height: 120rpx;" />
+      </view>
+      <view class="form-item">
+        <text class="label">子账号上限</text>
+        <input type="number" placeholder="请输入子账号上限，默认3个" bindinput="inputAccountLimit" value="{{newSchool.account_limit}}" />
+      </view>
+    </view>
+  </modal>
+  
+  <!-- 编辑学校模态框 -->
+  <modal wx:if="{{showEditModal}}" title="编辑学校" confirm-text="保存" cancel-text="取消" bindconfirm="updateSchool" bindcancel="hideEditSchoolModal">
+    <view class="modal-content">
+      <view class="form-item">
+        <text class="label">学校名称 *</text>
+        <input placeholder="请输入学校名称" bindinput="inputEditSchoolName" value="{{editSchool.name}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">联系人 *</text>
+        <input placeholder="请输入联系人" bindinput="inputEditContactPerson" value="{{editSchool.contact_person}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">联系电话 *</text>
+        <input placeholder="请输入联系电话" bindinput="inputEditContactPhone" value="{{editSchool.contact_phone}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">地址</text>
+        <input placeholder="请输入学校地址" bindinput="inputEditAddress" value="{{editSchool.address}}" />
+      </view>
+      <view class="form-item">
+        <text class="label">描述</text>
+        <textarea placeholder="请输入学校描述" bindinput="inputEditDescription" value="{{editSchool.description}}" style="height: 120rpx;" />
+      </view>
+      <view class="form-item">
+        <text class="label">子账号上限</text>
+        <input type="number" placeholder="请输入子账号上限" bindinput="inputEditAccountLimit" value="{{editSchool.account_limit}}" />
+      </view>
+    </view>
+  </modal>
+  
+  <!-- 确认删除模态框 -->
+  <modal wx:if="{{showDeleteModal}}" title="确认删除" confirm-text="删除" cancel-text="取消" bindconfirm="deleteSchool" bindcancel="hideDeleteModal">
+    <text>确定要删除此学校吗？</text>
+  </modal>
+</view>

@@ -1,0 +1,45 @@
+<view class="container">
+  <view class="header">
+    <text class="title">出勤管理</text>
+  </view>
+  
+  <view class="date-selector">
+    <picker mode="date" value="{{selectedDate}}" bindchange="bindDateChange">
+      <view class="picker">
+        选择日期: {{selectedDate}}
+      </view>
+    </picker>
+  </view>
+  
+  <view class="course-selector">
+    <picker range="{{courses}}" range-key="name" value="{{selectedCourseIndex}}" bindchange="bindCourseChange">
+      <view class="picker">
+        选择课程: {{selectedCourse ? selectedCourse.name : '请选择课程'}}
+      </view>
+    </picker>
+  </view>
+  
+  <button class="search-btn" bindtap="loadAttendance">查询出勤</button>
+  
+  <view class="attendance-list">
+    <view class="attendance-item" wx:for="{{attendanceList}}" wx:key="id">
+      <view class="student-info">
+        <text class="student-name">{{item.student_name}}</text>
+        <text class="student-id">{{item.student_id}}</text>
+      </view>
+      <view class="attendance-status">
+        <picker mode="selector" range="['出勤', '缺勤', '迟到']" value="{{item.status === '出勤' ? 0 : item.status === '缺勤' ? 1 : 2}}" bindchange="bindStatusChange" data-id="{{item.id}}">
+          <view class="status-badge {{item.status === '出勤' ? 'present' : item.status === '缺勤' ? 'absent' : 'late'}}">
+            {{item.status}}
+          </view>
+        </picker>
+      </view>
+    </view>
+  </view>
+  
+  <view class="empty" wx:if="{{attendanceList.length === 0}}">
+    <text>暂无出勤数据</text>
+  </view>
+  
+  <button class="save-btn" bindtap="saveAttendance" wx:if="{{attendanceList.length > 0}}">保存出勤记录</button>
+</view>
