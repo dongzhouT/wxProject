@@ -1,0 +1,49 @@
+<view class="container">
+  <view class="header">
+    <text class="title">{{courseId ? '编辑课程' : '添加课程'}}</text>
+  </view>
+  
+  <view class="form-container">
+    <view class="form-item">
+      <text class="label">课程名称</text>
+      <input type="text" placeholder="请输入课程名称" value="{{course.name}}" bindinput="inputName" />
+    </view>
+    
+    <view class="form-item">
+      <text class="label">课程价格</text>
+      <input type="number" placeholder="请输入课程价格" value="{{course.price}}" bindinput="inputPrice" />
+    </view>
+    
+    <view class="form-item">
+      <text class="label">课程描述</text>
+      <textarea placeholder="请输入课程描述" value="{{course.description}}" bindinput="inputDescription" />
+    </view>
+    
+    <view class="form-item">
+      <text class="label">开课时间</text>
+      <view class="schedule-container">
+        <view class="schedule-item" wx:for="{{weekDays}}" wx:key="index">
+          <checkbox value="{{item}}" checked="{{course.schedule.includes(item)}}" bindchange="toggleSchedule" data-day="{{item}}" />
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="form-item">
+      <text class="label">上课时间</text>
+      <input type="text" placeholder="请输入上课时间，例如：09:00-10:00" value="{{course.time}}" bindinput="inputTime" />
+    </view>
+    
+    <view class="form-item">
+      <text class="label">教师</text>
+      <input type="text" placeholder="请输入教师姓名" value="{{course.teacher}}" bindinput="inputTeacher" />
+    </view>
+    
+    <view class="form-item">
+      <text class="label">最大人数</text>
+      <input type="number" placeholder="请输入最大人数" value="{{course.max_students}}" bindinput="inputMaxStudents" />
+    </view>
+  </view>
+  
+  <button class="save-btn" bindtap="saveCourse">保存</button>
+</view>

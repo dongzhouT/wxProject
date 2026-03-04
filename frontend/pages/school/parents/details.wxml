@@ -47,5 +47,5 @@
   </view>
   
   <button class="edit-btn" bindtap="editParent">编辑家长信息</button>
-  <button class="add-order-btn" bindtap="addOrder">添加订单</button>
+  <!-- <button class="add-order-btn" bindtap="addOrder">添加订单</button> -->
 </view>

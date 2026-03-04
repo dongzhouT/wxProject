@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="header">
+    <text class="title">剩余课程</text>
+  </view>
+  
+  <view class="course-list">
+    <view class="course-item" wx:for="{{courseList}}" wx:key="id">
+      <view class="course-info">
+        <text class="course-name">{{item.name}}</text>
+        <view class="course-progress">
+          <text class="progress-text">剩余: {{item.remaining}}/{{item.total}} 课时</text>
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{(item.remaining / item.total) * 100}}%"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="empty" wx:if="{{courseList.length === 0}}">
+    <text>暂无课程信息</text>
+  </view>
+</view>

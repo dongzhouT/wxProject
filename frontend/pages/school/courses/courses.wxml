@@ -13,7 +13,6 @@
     <view class="course-item" wx:for="{{courses}}" wx:key="id">
       <view class="course-info">
         <text class="course-name">{{item.name}}</text>
-        <text class="course-category">{{item.category}}</text>
         <text class="course-price">¥{{item.price}}/课时</text>
       </view>
       <view class="course-actions">

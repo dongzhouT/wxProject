@@ -1,0 +1,97 @@
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.date-picker {
+  background-color: #fff;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.picker {
+  font-size: 28rpx;
+  color: #333;
+  text-align: center;
+}
+
+.schedule-list {
+  background-color: #fff;
+  border-radius: 8rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.schedule-time {
+  width: 120rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.schedule-info {
+  flex: 1;
+  margin-left: 20rpx;
+}
+
+.course-name {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5rpx;
+}
+
+.teacher-name {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.schedule-status {
+  margin-left: 20rpx;
+}
+
+.status-text {
+  font-size: 24rpx;
+  color: #1989fa;
+  padding: 5rpx 15rpx;
+  border: 1rpx solid #1989fa;
+  border-radius: 15rpx;
+}
+
+.empty {
+  background-color: #fff;
+  padding: 60rpx;
+  text-align: center;
+  border-radius: 8rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  margin-top: 20rpx;
+}
+
+.empty text {
+  font-size: 28rpx;
+  color: #999;
+}

@@ -24,6 +24,28 @@
       <text class="label">备注</text>
       <textarea placeholder="请输入备注信息" value="{{parent.remark}}" bindinput="inputRemark" />
     </view>
+    
+    <view class="form-item">
+      <text class="label">关联订单</text>
+      <switch checked="{{createOrder}}" bindchange="toggleCreateOrder" />
+    </view>
+    
+    <view class="order-form" wx:if="{{createOrder}}">
+      <view class="form-item">
+        <text class="label">订单金额</text>
+        <input type="number" placeholder="请输入订单金额" value="{{orderAmount}}" bindinput="inputOrderAmount" />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">课时数量</text>
+        <input type="number" placeholder="请输入课时数量" value="{{lessonCount}}" bindinput="inputLessonCount" />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">课程名称</text>
+        <input type="text" placeholder="请输入课程名称" value="{{courseName}}" bindinput="inputCourseName" />
+      </view>
+    </view>
   </view>
   
   <button class="save-btn" bindtap="saveParent">保存</button>

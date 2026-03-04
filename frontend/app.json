@@ -10,8 +10,15 @@
     "pages/school/parents/edit",
     "pages/school/parents/details",
     "pages/school/courses/courses",
+    "pages/school/courses/edit",
+    "pages/school/courses/details",
     "pages/school/attendance/attendance",
-    "pages/school/consume/consume"
+    "pages/school/consume/consume",
+    "pages/parent/schedule/schedule",
+    "pages/parent/leave/leave",
+    "pages/parent/booking/booking",
+    "pages/parent/course_count/course_count",
+    "pages/parent/notifications/notifications"
   ],
   "window": {
     "backgroundTextStyle": "light",

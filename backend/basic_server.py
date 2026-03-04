@@ -27,9 +27,9 @@ class MockDB:
         ]
         # 课程数据
         self.courses = [
-            {'id': 1, 'name': '钢琴课', 'category': '音乐', 'price': 100, 'school_id': 1},
-            {'id': 2, 'name': '绘画课', 'category': '美术', 'price': 80, 'school_id': 1},
-            {'id': 3, 'name': '舞蹈课', 'category': '舞蹈', 'price': 90, 'school_id': 1}
+            {'id': 1, 'name': '钢琴课', 'category': '音乐', 'price': 100, 'school_id': 1, 'schedule': ['周一', '周三', '周五'], 'teacher': '张老师', 'time': '09:00-10:00', 'max_students': 5, 'current_students': 2},
+            {'id': 2, 'name': '绘画课', 'category': '美术', 'price': 80, 'school_id': 1, 'schedule': ['周二', '周四'], 'teacher': '李老师', 'time': '14:00-15:00', 'max_students': 8, 'current_students': 3},
+            {'id': 3, 'name': '舞蹈课', 'category': '舞蹈', 'price': 90, 'school_id': 1, 'schedule': ['周六', '周日'], 'teacher': '王老师', 'time': '16:00-17:00', 'max_students': 10, 'current_students': 8}
         ]
         # 学生数据
         self.students = []
@@ -40,7 +40,17 @@ class MockDB:
 db = MockDB()
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
+    def get_parameter(self, name):
+        import urllib.parse
+        if '?' in self.path:
+            query_string = self.path.split('?')[1]
+            params = urllib.parse.parse_qs(query_string)
+            if name in params:
+                return params[name][0]
+        return None
+    
     def do_GET(self):
+        print(f"GET 请求路径: {self.path}")
         # 健康检查
         if self.path == '/api/health':
             self.send_response(200)
@@ -52,18 +62,142 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                 'message': '服务正常'
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
+        # 获取课程详情
+        elif self.path.startswith('/api/school/courses/'):
+            # 提取课程ID
+            parts = self.path.split('/')
+            if len(parts) > 4:
+                course_id = int(parts[-1])
+                # 获取课程详情
+                course = next((c for c in db.courses if c['id'] == course_id), None)
+                if course:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    response = {
+                        'code': 200,
+                        'message': '获取课程详情成功',
+                        'data': course
+                    }
+                    self.wfile.write(json.dumps(response).encode('utf-8'))
+                else:
+                    self.send_response(404)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    response = {
+                        'code': 404,
+                        'message': '课程不存在'
+                    }
+                    self.wfile.write(json.dumps(response).encode('utf-8'))
         # 获取课程列表
-        elif self.path == '/api/school/courses':
+        elif self.path == '/api/school/courses' or self.path.startswith('/api/school/courses?'):
+            search = self.get_parameter('search')
+            
+            # 模拟课程数据
+            courses = db.courses
+            if search:
+                courses = [c for c in courses if search in c.get('name', '')]
+            
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             response = {
                 'code': 200,
-                'message': '获取成功',
-                'data': db.courses
+                'message': '获取课程列表成功',
+                'data': courses
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
+        # 获取学校家长列表
+        elif self.path == '/api/school/parents' or self.path.startswith('/api/school/parents?'):
+            search = self.get_parameter('search')
+            
+            # 模拟家长数据
+            parents = db.parents
+            if search:
+                parents = [p for p in parents if search in p.get('nickname', '') or any(search in phone for phone in p.get('phones', []))]
+            
+            # 为每个家长添加订单数
+            for parent in parents:
+                parent['order_count'] = len(parent.get('orders', []))
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'code': 200,
+                'message': '获取家长列表成功',
+                'data': parents
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        # 获取订单详情
+        elif self.path.startswith('/api/school/orders/'):
+            order_id = self.path.split('/')[-1]
+            # 在所有家长中查找订单
+            found_order = None
+            for parent in db.parents:
+                if 'orders' in parent:
+                    for order in parent['orders']:
+                        if order['order_id'] == order_id:
+                            found_order = order
+                            break
+                    if found_order:
+                        break
+            
+            if found_order:
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 200,
+                    'message': '获取订单详情成功',
+                    'data': found_order
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            else:
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 404,
+                    'message': '订单不存在'
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+        # 获取学校家长详情
+        elif self.path.startswith('/api/school/parents/'):
+            parent_id = int(self.path.split('/')[-1])
+            # 获取家长详情
+            parent = next((p for p in db.parents if p['id'] == parent_id), None)
+            if parent:
+                # 确保家长有orders属性
+                if 'orders' not in parent:
+                    parent['orders'] = []
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 200,
+                    'message': '获取家长详情成功',
+                    'data': parent
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            else:
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 404,
+                    'message': '家长不存在'
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
         # 获取学校列表（管理员）
         elif self.path == '/api/admin/schools':
             self.send_response(200)
@@ -105,6 +239,166 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                     'course_count': len(db.courses),
                     'order_count': len(db.orders)
                 }
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        # 家长端API
+        elif self.path == '/api/parent/schedule':
+            # 获取家长课表
+            date = self.get_parameter('date')
+            # 模拟数据
+            schedule = [
+                {'time': '09:00-10:00', 'courseName': '钢琴课', 'teacherName': '张老师', 'status': '已确认'},
+                {'time': '14:00-15:00', 'courseName': '绘画课', 'teacherName': '李老师'}
+            ]
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'code': 200,
+                'message': '获取课表成功',
+                'data': schedule
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        elif self.path == '/api/parent/courses':
+            # 获取家长课程列表
+            # 模拟数据
+            courses = [
+                {'id': 1, 'name': '钢琴课'},
+                {'id': 2, 'name': '绘画课'},
+                {'id': 3, 'name': '舞蹈课'}
+            ]
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'code': 200,
+                'message': '获取课程列表成功',
+                'data': courses
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        elif self.path == '/api/parent/leave' and self.command == 'POST':
+            # 提交请假申请
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+            
+            # 模拟处理
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'code': 200,
+                'message': '请假申请提交成功'
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        elif self.path == '/api/parent/booking':
+            if self.command == 'GET':
+                # 获取可预约课程列表
+                # 从课程数据中获取，计算剩余名额
+                booking_courses = []
+                for course in db.courses:
+                    remaining = course.get('max_students', 10) - course.get('current_students', 0)
+                    if remaining > 0:
+                        booking_courses.append({
+                            'id': course['id'],
+                            'name': course['name'],
+                            'time': course.get('time', '待定'),
+                            'teacher': course.get('teacher', '待定'),
+                            'remaining': remaining
+                        })
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 200,
+                    'message': '获取可预约课程成功',
+                    'data': booking_courses
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            elif self.command == 'POST':
+                # 提交预约
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                data = json.loads(post_data.decode('utf-8'))
+                
+                course_id = data.get('course_id')
+                # 查找课程并更新当前预约人数
+                course_found = False
+                for course in db.courses:
+                    if course['id'] == course_id:
+                        course_found = True
+                        max_students = course.get('max_students', 10)
+                        current_students = course.get('current_students', 0)
+                        if current_students < max_students:
+                            course['current_students'] = current_students + 1
+                            self.send_response(200)
+                            self.send_header('Content-type', 'application/json')
+                            self.send_header('Access-Control-Allow-Origin', '*')
+                            self.end_headers()
+                            response = {
+                                'code': 200,
+                                'message': '预约成功'
+                            }
+                            self.wfile.write(json.dumps(response).encode('utf-8'))
+                        else:
+                            self.send_response(400)
+                            self.send_header('Content-type', 'application/json')
+                            self.send_header('Access-Control-Allow-Origin', '*')
+                            self.end_headers()
+                            response = {
+                                'code': 400,
+                                'message': '课程名额已满'
+                            }
+                            self.wfile.write(json.dumps(response).encode('utf-8'))
+                        break
+                if not course_found:
+                    self.send_response(404)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    response = {
+                        'code': 404,
+                        'message': '课程不存在'
+                    }
+                    self.wfile.write(json.dumps(response).encode('utf-8'))
+        elif self.path == '/api/parent/course-count':
+            # 获取剩余课程
+            # 模拟数据
+            courses = [
+                {'id': 1, 'name': '钢琴课', 'total': 20, 'remaining': 15},
+                {'id': 2, 'name': '绘画课', 'total': 15, 'remaining': 10},
+                {'id': 3, 'name': '舞蹈课', 'total': 10, 'remaining': 8}
+            ]
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'code': 200,
+                'message': '获取剩余课程成功',
+                'data': courses
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        elif self.path == '/api/parent/notifications':
+            # 获取通知
+            # 模拟数据
+            notifications = [
+                {'id': 1, 'time': '2026-03-01 10:00', 'content': '您的孩子今天的钢琴课已完成', 'read': True},
+                {'id': 2, 'time': '2026-03-02 14:00', 'content': '下周课程安排已更新', 'read': False},
+                {'id': 3, 'time': '2026-03-03 09:00', 'content': '请及时确认本周的课程安排', 'read': False}
+            ]
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'code': 200,
+                'message': '获取通知成功',
+                'data': notifications
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
         else:
@@ -299,82 +593,95 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                     'message': '登录失败'
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))
-        # 学校获取家长列表
+        # 学校创建家长
         elif self.path == '/api/school/parents':
-            if self.command == 'GET':
-                search = self.get_parameter('search')
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+            
+            # 模拟创建家长
+            new_parent = {
+                'id': len(db.parents) + 1,
+                'nickname': data.get('nickname'),
+                'phones': data.get('phones', []),
+                'remark': data.get('remark'),
+                'orders': []
+            }
+            
+            # 检查是否需要创建订单
+            if data.get('create_order', False):
+                import time
+                # 生成唯一订单号（时间戳）
+                order_id = 'ORD' + str(int(time.time() * 1000))
                 
-                # 模拟家长数据
-                parents = db.parents
-                if search:
-                    parents = [p for p in parents if search in p.get('nickname', '') or any(search in phone for phone in p.get('phones', []))]
-                
-                # 为每个家长添加订单数
-                for parent in parents:
-                    parent['order_count'] = len(parent.get('orders', []))
-                
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                response = {
-                    'code': 200,
-                    'message': '获取家长列表成功',
-                    'data': parents
+                # 创建订单
+                new_order = {
+                    'id': 1,
+                    'order_id': order_id,
+                    'created_at': time.strftime('%Y-%m-%d', time.localtime()),
+                    'type': data.get('order_type', '课时包'),
+                    'status': data.get('order_status', '已支付'),
+                    'amount': data.get('order_amount', 0),
+                    'lesson_packages': []
                 }
-                self.wfile.write(json.dumps(response).encode('utf-8'))
-            elif self.command == 'POST':
+                
+                # 添加课时包
+                if data.get('lesson_count'):
+                    new_order['lesson_packages'].append({
+                        'id': 1,
+                        'course_name': data.get('course_name', '通用课程'),
+                        'total_lessons': data.get('lesson_count', 0),
+                        'remaining_lessons': data.get('lesson_count', 0)
+                    })
+                
+                new_parent['orders'].append(new_order)
+            
+            db.parents.append(new_parent)
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'code': 200,
+                'message': '创建家长成功',
+                'data': new_parent
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        
+        # 学校家长管理（更新和删除）
+        elif self.path.startswith('/api/school/parents/'):
+            parts = self.path.split('/')
+            print(f"路径: {self.path}")
+            print(f"parts: {parts}")
+            print(f"parts长度: {len(parts)}")
+            
+            # 检查是否是添加订单的请求
+            if len(parts) == 6 and parts[5] == 'orders' and self.command == 'POST':
+                parent_id = int(parts[-2])
                 content_length = int(self.headers['Content-Length'])
                 post_data = self.rfile.read(content_length)
                 data = json.loads(post_data.decode('utf-8'))
                 
-                # 模拟创建家长
-                new_parent = {
-                    'id': len(db.parents) + 1,
-                    'nickname': data.get('nickname'),
-                    'phones': data.get('phones', []),
-                    'remark': data.get('remark'),
-                    'orders': []
-                }
-                db.parents.append(new_parent)
-                
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                response = {
-                    'code': 200,
-                    'message': '创建家长成功',
-                    'data': new_parent
-                }
-                self.wfile.write(json.dumps(response).encode('utf-8'))
-        
-        # 学校家长详情和管理
-        elif self.path.startswith('/api/school/parents/'):
-            parent_id = int(self.path.split('/')[-1])
-            if self.command == 'GET':
-                # 获取家长详情
+                # 查找家长
                 parent = next((p for p in db.parents if p['id'] == parent_id), None)
                 if parent:
-                    # 模拟订单和课时包数据
-                    if not parent.get('orders'):
-                        parent['orders'] = [
-                            {
-                                'id': 1,
-                                'order_id': 'ORD' + str(parent_id) + '001',
-                                'created_at': '2026-03-01',
-                                'status': '已支付',
-                                'amount': 1000,
-                                'lesson_packages': [
-                                    {
-                                        'id': 1,
-                                        'course_name': '数学兴趣班',
-                                        'total_lessons': 20,
-                                        'remaining_lessons': 15
-                                    }
-                                ]
-                            }
-                        ]
+                    # 确保家长有orders数组
+                    if 'orders' not in parent:
+                        parent['orders'] = []
+                    
+                    # 创建新订单
+                    new_order = {
+                        'id': len(parent['orders']) + 1,
+                        'order_id': 'ORD' + str(parent_id) + str(len(parent['orders']) + 1).zfill(3),
+                        'created_at': '2026-03-03',  # 实际应用中应该使用当前日期
+                        'type': data.get('type', '课时包'),
+                        'status': data.get('status', '已支付'),
+                        'amount': data.get('amount', 0),
+                        'lesson_packages': data.get('lesson_packages', [])
+                    }
+                    
+                    parent['orders'].append(new_order)
                     
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
@@ -382,8 +689,8 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                     self.end_headers()
                     response = {
                         'code': 200,
-                        'message': '获取家长详情成功',
-                        'data': parent
+                        'message': '添加订单成功',
+                        'data': new_order
                     }
                     self.wfile.write(json.dumps(response).encode('utf-8'))
                 else:
@@ -396,23 +703,135 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                         'message': '家长不存在'
                     }
                     self.wfile.write(json.dumps(response).encode('utf-8'))
-            elif self.command == 'PUT':
-                # 更新家长
-                content_length = int(self.headers['Content-Length'])
-                post_data = self.rfile.read(content_length)
-                data = json.loads(post_data.decode('utf-8'))
-                
-                parent = next((p for p in db.parents if p['id'] == parent_id), None)
-                if parent:
-                    parent.update(data)
+            else:
+                # 其他请求（PUT 和 DELETE）
+                parent_id = int(parts[-1])
+                if self.command == 'PUT':
+                    # 更新家长
+                    content_length = int(self.headers['Content-Length'])
+                    post_data = self.rfile.read(content_length)
+                    data = json.loads(post_data.decode('utf-8'))
+                    
+                    parent = next((p for p in db.parents if p['id'] == parent_id), None)
+                    if parent:
+                        # 移除订单相关参数，单独处理
+                        create_order = data.pop('create_order', False)
+                        order_amount = data.pop('order_amount', None)
+                        lesson_count = data.pop('lesson_count', None)
+                        course_name = data.pop('course_name', None)
+                        
+                        # 更新家长基本信息
+                        parent.update(data)
+                        
+                        # 处理订单更新
+                        if create_order:
+                            import time
+                            # 如果家长没有订单，创建新订单
+                            if not parent.get('orders'):
+                                parent['orders'] = []
+                            
+                            # 如果已有订单，更新第一个订单
+                            if parent['orders']:
+                                order = parent['orders'][0]
+                                if order_amount is not None:
+                                    order['amount'] = order_amount
+                                if lesson_count:
+                                    if not order.get('lesson_packages'):
+                                        order['lesson_packages'] = []
+                                    if order['lesson_packages']:
+                                        lesson_package = order['lesson_packages'][0]
+                                        lesson_package['total_lessons'] = lesson_count
+                                        lesson_package['remaining_lessons'] = lesson_count
+                                        if course_name:
+                                            lesson_package['course_name'] = course_name
+                                    else:
+                                        # 创建新的课时包
+                                        order['lesson_packages'].append({
+                                            'id': 1,
+                                            'course_name': course_name or '通用课程',
+                                            'total_lessons': lesson_count,
+                                            'remaining_lessons': lesson_count
+                                        })
+                            else:
+                                # 创建新订单
+                                order_id = 'ORD' + str(int(time.time() * 1000))
+                                new_order = {
+                                    'id': 1,
+                                    'order_id': order_id,
+                                    'created_at': time.strftime('%Y-%m-%d', time.localtime()),
+                                    'type': '课时包',
+                                    'status': '已支付',
+                                    'amount': order_amount or 0,
+                                    'lesson_packages': []
+                                }
+                                if lesson_count:
+                                    new_order['lesson_packages'].append({
+                                        'id': 1,
+                                        'course_name': course_name or '通用课程',
+                                        'total_lessons': lesson_count,
+                                        'remaining_lessons': lesson_count
+                                    })
+                                parent['orders'].append(new_order)
+                        
+                        self.send_response(200)
+                        self.send_header('Content-type', 'application/json')
+                        self.send_header('Access-Control-Allow-Origin', '*')
+                        self.end_headers()
+                        response = {
+                            'code': 200,
+                            'message': '更新家长成功',
+                            'data': parent
+                        }
+                        self.wfile.write(json.dumps(response).encode('utf-8'))
+                    else:
+                        self.send_response(404)
+                        self.send_header('Content-type', 'application/json')
+                        self.send_header('Access-Control-Allow-Origin', '*')
+                        self.end_headers()
+                        response = {
+                            'code': 404,
+                            'message': '家长不存在'
+                        }
+                        self.wfile.write(json.dumps(response).encode('utf-8'))
+                elif self.command == 'DELETE':
+                    # 删除家长
+                    db.parents = [p for p in db.parents if p['id'] != parent_id]
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
                     self.send_header('Access-Control-Allow-Origin', '*')
                     self.end_headers()
                     response = {
                         'code': 200,
-                        'message': '更新家长成功',
-                        'data': parent
+                        'message': '删除家长成功'
+                    }
+                    self.wfile.write(json.dumps(response).encode('utf-8'))
+        
+        # 订单管理接口
+        elif self.path.startswith('/api/school/orders/'):
+            order_id = self.path.split('/')[-1]
+            
+            if self.command == 'GET':
+                # 获取订单详情
+                # 在所有家长中查找订单
+                found_order = None
+                for parent in db.parents:
+                    if 'orders' in parent:
+                        for order in parent['orders']:
+                            if order['order_id'] == order_id:
+                                found_order = order
+                                break
+                        if found_order:
+                            break
+                
+                if found_order:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    response = {
+                        'code': 200,
+                        'message': '获取订单详情成功',
+                        'data': found_order
                     }
                     self.wfile.write(json.dumps(response).encode('utf-8'))
                 else:
@@ -422,21 +841,55 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                     self.end_headers()
                     response = {
                         'code': 404,
-                        'message': '家长不存在'
+                        'message': '订单不存在'
                     }
                     self.wfile.write(json.dumps(response).encode('utf-8'))
-            elif self.command == 'DELETE':
-                # 删除家长
-                db.parents = [p for p in db.parents if p['id'] != parent_id]
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                response = {
-                    'code': 200,
-                    'message': '删除家长成功'
-                }
-                self.wfile.write(json.dumps(response).encode('utf-8'))
+            elif self.command == 'PUT':
+                # 更新订单
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                data = json.loads(post_data.decode('utf-8'))
+                
+                # 在所有家长中查找订单
+                found_order = None
+                for parent in db.parents:
+                    if 'orders' in parent:
+                        for order in parent['orders']:
+                            if order['order_id'] == order_id:
+                                found_order = order
+                                break
+                        if found_order:
+                            break
+                
+                if found_order:
+                    # 更新订单信息
+                    found_order.update({
+                        'type': data.get('type', found_order.get('type')),
+                        'status': data.get('status', found_order.get('status')),
+                        'amount': data.get('amount', found_order.get('amount')),
+                        'lesson_packages': data.get('lesson_packages', found_order.get('lesson_packages'))
+                    })
+                    
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    response = {
+                        'code': 200,
+                        'message': '更新订单成功',
+                        'data': found_order
+                    }
+                    self.wfile.write(json.dumps(response).encode('utf-8'))
+                else:
+                    self.send_response(404)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    response = {
+                        'code': 404,
+                        'message': '订单不存在'
+                    }
+                    self.wfile.write(json.dumps(response).encode('utf-8'))
         
         # 学校获取课程列表
         elif self.path == '/api/school/courses':
@@ -467,9 +920,13 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                 new_course = {
                     'id': len(db.courses) + 1,
                     'name': data.get('name'),
-                    'category': data.get('category'),
                     'price': data.get('price'),
-                    'description': data.get('description')
+                    'description': data.get('description'),
+                    'schedule': data.get('schedule', []),
+                    'teacher': data.get('teacher', '待定'),
+                    'time': data.get('time', '待定'),
+                    'max_students': data.get('max_students', 10),
+                    'current_students': 0
                 }
                 db.courses.append(new_course)
                 
@@ -484,9 +941,21 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                 }
                 self.wfile.write(json.dumps(response).encode('utf-8'))
         
-        # 学校课程详情和删除
+        # 学校课程更新和删除
         elif self.path.startswith('/api/school/courses/'):
-            course_id = int(self.path.split('/')[-1])
+            try:
+                course_id = int(self.path.split('/')[-1])
+            except ValueError:
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 404,
+                    'message': '课程不存在'
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                return
             if self.command == 'GET':
                 # 获取课程详情
                 course = next((c for c in db.courses if c['id'] == course_id), None)
@@ -703,8 +1172,55 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             }
             self.wfile.write(json.dumps(response).encode('utf-8'))
     def do_PUT(self):
+        # 更新订单信息（学校）
+        if self.path.startswith('/api/school/orders/'):
+            order_id = self.path.split('/')[-1]
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+            
+            # 在所有家长中查找订单
+            found_order = None
+            for parent in db.parents:
+                if 'orders' in parent:
+                    for order in parent['orders']:
+                        if order['order_id'] == order_id:
+                            found_order = order
+                            break
+                    if found_order:
+                        break
+            
+            if found_order:
+                # 更新订单信息
+                found_order.update({
+                    'type': data.get('type', found_order.get('type')),
+                    'status': data.get('status', found_order.get('status')),
+                    'amount': data.get('amount', found_order.get('amount')),
+                    'lesson_packages': data.get('lesson_packages', found_order.get('lesson_packages'))
+                })
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 200,
+                    'message': '更新订单成功',
+                    'data': found_order
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            else:
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 404,
+                    'message': '订单不存在'
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
         # 更新学校账户信息（管理员）
-        if self.path.startswith('/api/admin/accounts/'):
+        elif self.path.startswith('/api/admin/accounts/'):
             try:
                 account_id = int(self.path.split('/')[-1])
                 content_length = int(self.headers['Content-Length'])

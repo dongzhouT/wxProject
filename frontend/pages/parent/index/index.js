@@ -18,41 +18,36 @@ Page({
 
   // 导航到课表页面
   navigateToSchedule: function() {
-    wx.showToast({
-      title: '查看课表功能开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/parent/schedule/schedule'
     });
   },
 
   // 导航到请假申请页面
   navigateToLeave: function() {
-    wx.showToast({
-      title: '请假申请功能开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/parent/leave/leave'
     });
   },
 
   // 导航到约课页面
   navigateToBooking: function() {
-    wx.showToast({
-      title: '约课功能开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/parent/booking/booking'
     });
   },
 
   // 导航到剩余课程页面
   navigateToCourseCount: function() {
-    wx.showToast({
-      title: '剩余课程功能开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/parent/course_count/course_count'
     });
   },
 
   // 导航到通知页面
   navigateToNotifications: function() {
-    wx.showToast({
-      title: '接收通知功能开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/pages/parent/notifications/notifications'
     });
   },
 

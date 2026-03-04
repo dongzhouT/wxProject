@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="header">
+    <text class="title">{{isEdit ? '编辑订单' : '添加订单'}}</text>
+  </view>
+  
+  <view class="form-container">
+    <view class="form-item">
+      <text class="label">订单类型</text>
+      <picker bindchange="bindTypeChange" value="{{order.typeIndex}}" range="{{types}}">
+        <view class="picker">
+          {{types[order.typeIndex]}}
+        </view>
+      </picker>
+    </view>
+    
+    <view class="form-item">
+      <text class="label">订单金额</text>
+      <input placeholder="请输入订单金额" value="{{order.amount}}" bindinput="bindAmountInput" type="number" />
+    </view>
+    
+    <view class="form-item">
+      <text class="label">总课时</text>
+      <input placeholder="请输入总课时" value="{{order.total_lessons}}" bindinput="bindTotalLessonsInput" type="number" />
+    </view>
+    
+    <view class="form-item">
+      <text class="label">课程名称</text>
+      <input placeholder="请输入课程名称" value="{{order.course_name}}" bindinput="bindCourseNameInput" />
+    </view>
+    
+    <view class="form-item">
+      <text class="label">订单状态</text>
+      <picker bindchange="bindStatusChange" value="{{order.statusIndex}}" range="{{statuses}}">
+        <view class="picker">
+          {{statuses[order.statusIndex]}}
+        </view>
+      </picker>
+    </view>
+  </view>
+  
+  <button class="save-btn" bindtap="saveOrder">保存订单</button>
+</view>

@@ -1,0 +1,32 @@
+<view class="container">
+  <view class="header">
+    <text class="title">课程详情</text>
+  </view>
+  
+  <view class="course-info">
+    <view class="info-item">
+      <text class="label">课程名称</text>
+      <text class="value">{{course.name}}</text>
+    </view>
+    
+    <view class="info-item">
+      <text class="label">课程价格</text>
+      <text class="value">¥{{course.price}}/课时</text>
+    </view>
+    
+    <view class="info-item">
+      <text class="label">课程描述</text>
+      <text class="value">{{course.description || '无'}}</text>
+    </view>
+    
+    <view class="info-item">
+      <text class="label">开课时间</text>
+      <text class="value">{{course.schedule && course.schedule.length > 0 ? course.schedule.join('、') : '无'}}</text>
+    </view>
+  </view>
+  
+  <view class="action-buttons">
+    <button class="edit-btn" bindtap="editCourse">编辑课程</button>
+    <button class="delete-btn" bindtap="deleteCourse">删除课程</button>
+  </view>
+</view>

@@ -1,0 +1,32 @@
+<view class="container">
+  <view class="header">
+    <text class="title">请假申请</text>
+  </view>
+  
+  <view class="form-container">
+    <view class="form-item">
+      <text class="label">请假日期</text>
+      <picker mode="date" value="{{leaveDate}}" bindchange="bindDateChange">
+        <view class="picker">
+          {{leaveDate}}
+        </view>
+      </picker>
+    </view>
+    
+    <view class="form-item">
+      <text class="label">请假课程</text>
+      <picker bindchange="bindCourseChange" value="{{courseIndex}}" range="{{courseList}}">
+        <view class="picker">
+          {{courseList[courseIndex]}}
+        </view>
+      </picker>
+    </view>
+    
+    <view class="form-item">
+      <text class="label">请假原因</text>
+      <textarea placeholder="请输入请假原因" value="{{leaveReason}}" bindinput="inputLeaveReason" />
+    </view>
+  </view>
+  
+  <button class="submit-btn" bindtap="submitLeave">提交申请</button>
+</view>

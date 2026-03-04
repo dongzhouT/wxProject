@@ -1,0 +1,32 @@
+<view class="container">
+  <view class="header">
+    <text class="title">课程表</text>
+  </view>
+  
+  <view class="date-picker">
+    <picker mode="date" value="{{currentDate}}" bindchange="bindDateChange">
+      <view class="picker">
+        {{currentDate}}
+      </view>
+    </picker>
+  </view>
+  
+  <view class="schedule-list">
+    <view class="schedule-item" wx:for="{{scheduleList}}" wx:key="index">
+      <view class="schedule-time">
+        <text>{{item.time}}</text>
+      </view>
+      <view class="schedule-info">
+        <text class="course-name">{{item.courseName}}</text>
+        <text class="teacher-name">{{item.teacherName}}</text>
+      </view>
+      <view class="schedule-status" wx:if="{{item.status}}">
+        <text class="status-text">{{item.status}}</text>
+      </view>
+    </view>
+  </view>
+  
+  <view class="empty" wx:if="{{scheduleList.length === 0}}">
+    <text>当日无课程</text>
+  </view>
+</view>

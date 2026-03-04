@@ -1,0 +1,19 @@
+<view class="container">
+  <view class="header">
+    <text class="title">通知</text>
+  </view>
+  
+  <view class="notification-list">
+    <view class="notification-item" wx:for="{{notifications}}" wx:key="id">
+      <view class="notification-time">{{item.time}}</view>
+      <view class="notification-content">{{item.content}}</view>
+      <view class="notification-status" wx:if="{{!item.read}}">
+        <text class="status-dot"></text>
+      </view>
+    </view>
+  </view>
+  
+  <view class="empty" wx:if="{{notifications.length === 0}}">
+    <text>暂无通知</text>
+  </view>
+</view>

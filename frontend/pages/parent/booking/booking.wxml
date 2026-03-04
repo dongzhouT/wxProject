@@ -1,0 +1,21 @@
+<view class="container">
+  <view class="header">
+    <text class="title">约课</text>
+  </view>
+  
+  <view class="course-list">
+    <view class="course-item" wx:for="{{courseList}}" wx:key="id">
+      <view class="course-info">
+        <text class="course-name">{{item.name}}</text>
+        <text class="course-time">{{item.time}}</text>
+        <text class="course-teacher">{{item.teacher}}</text>
+        <text class="course-remaining">剩余名额: {{item.remaining}}</text>
+      </view>
+      <button class="book-btn" bindtap="bookCourse" data-id="{{item.id}}">预约</button>
+    </view>
+  </view>
+  
+  <view class="empty" wx:if="{{courseList.length === 0}}">
+    <text>暂无可预约课程</text>
+  </view>
+</view>
