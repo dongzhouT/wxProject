@@ -1439,6 +1439,99 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         self.end_headers()
+    
+    def do_PUT(self):
+        # 学校课程更新
+        if self.path.startswith('/api/school/courses/'):
+            try:
+                course_id = int(self.path.split('/')[-1])
+            except ValueError:
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 404,
+                    'message': '课程不存在'
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                return
+            # 更新课程
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+            
+            course = next((c for c in db.courses if c['id'] == course_id), None)
+            if course:
+                course.update(data)
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 200,
+                    'message': '更新课程成功',
+                    'data': course
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            else:
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 404,
+                    'message': '课程不存在'
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+        else:
+            self.send_response(404)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'code': 404,
+                'message': '接口不存在'
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+    
+    def do_DELETE(self):
+        # 学校课程删除
+        if self.path.startswith('/api/school/courses/'):
+            try:
+                course_id = int(self.path.split('/')[-1])
+            except ValueError:
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                response = {
+                    'code': 404,
+                    'message': '课程不存在'
+                }
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+                return
+            # 删除课程
+            db.courses = [c for c in db.courses if c['id'] != course_id]
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'code': 200,
+                'message': '删除课程成功'
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
+        else:
+            self.send_response(404)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = {
+                'code': 404,
+                'message': '接口不存在'
+            }
+            self.wfile.write(json.dumps(response).encode('utf-8'))
 
 with socketserver.TCPServer(('127.0.0.1', PORT), MyHandler) as httpd:
     print(f"服务器运行在 http://127.0.0.1:{PORT}")

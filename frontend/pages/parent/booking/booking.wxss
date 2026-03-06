@@ -26,13 +26,14 @@
 
 .course-item {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 20rpx;
   border-bottom: 1rpx solid #f0f0f0;
 }
 
 .course-info {
-  flex: 1;
+  width: 100%;
+  margin-bottom: 20rpx;
 }
 
 .course-name {
@@ -40,27 +41,46 @@
   font-size: 28rpx;
   font-weight: bold;
   color: #333;
-  margin-bottom: 5rpx;
+  margin-bottom: 10rpx;
 }
 
-.course-time {
+.course-schedule {
+  margin-bottom: 10rpx;
+}
+
+.schedule-label {
   display: block;
   font-size: 24rpx;
   color: #666;
   margin-bottom: 5rpx;
+}
+
+.schedule-item {
+  display: block;
+  font-size: 24rpx;
+  color: #333;
+  margin-bottom: 3rpx;
+  padding-left: 20rpx;
 }
 
 .course-teacher {
   display: block;
   font-size: 24rpx;
   color: #666;
-  margin-bottom: 5rpx;
+  margin-bottom: 10rpx;
 }
 
 .course-remaining {
   display: block;
   font-size: 24rpx;
   color: #ff4d4f;
+  margin-bottom: 15rpx;
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10rpx;
 }
 
 .book-btn {
@@ -70,10 +90,28 @@
   color: #fff;
   font-size: 26rpx;
   border-radius: 8rpx;
-  margin-left: 20rpx;
 }
 
 .book-btn::after {
+  border-radius: 8rpx;
+}
+
+.book-btn[disabled] {
+  background-color: #ccc;
+  color: #fff;
+}
+
+.cancel-btn {
+  width: 120rpx;
+  height: 60rpx;
+  background-color: #fff;
+  color: #ff4d4f;
+  font-size: 26rpx;
+  border-radius: 8rpx;
+  border: 1rpx solid #ff4d4f;
+}
+
+.cancel-btn::after {
   border-radius: 8rpx;
 }
 

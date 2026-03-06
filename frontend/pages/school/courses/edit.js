@@ -39,6 +39,12 @@ Page({
             max_students: courseData.max_students || 10
           }
         });
+      } else {
+        wx.showToast({
+          title: res.message || '课程不存在',
+          icon: 'none'
+        });
+        wx.navigateBack();
       }
     });
   },

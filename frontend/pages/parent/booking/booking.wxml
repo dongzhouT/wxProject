@@ -7,11 +7,19 @@
     <view class="course-item" wx:for="{{courseList}}" wx:key="id">
       <view class="course-info">
         <text class="course-name">{{item.name}}</text>
-        <text class="course-time">{{item.time}}</text>
-        <text class="course-teacher">{{item.teacher}}</text>
-        <text class="course-remaining">剩余名额: {{item.remaining}}</text>
+        <view class="course-schedule">
+          <text class="schedule-label">上课时间:</text>
+          <text class="schedule-item" wx:for="{{item.schedule}}" wx:key="*this">{{item}}</text>
+        </view>
+        <text class="course-teacher">教师: {{item.teacher}}</text>
+        <text class="course-remaining">剩余名额: {{item.remaining}}/{{item.max_students}}</text>
       </view>
-      <button class="book-btn" bindtap="bookCourse" data-id="{{item.id}}">预约</button>
+      <view class="button-group">
+        <button wx:if="!item.booked" class="book-btn" bindtap="bookCourse" data-id="{{item.id}}" disabled="{{item.remaining <= 0}}">
+          {{item.remaining <= 0 ? '名额已满' : '预约'}}
+        </button>
+        <button wx:else class="cancel-btn" bindtap="cancelBooking" data-id="{{item.id}}">取消预约</button>
+      </view>
     </view>
   </view>
   
